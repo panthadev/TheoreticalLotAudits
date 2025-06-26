@@ -724,17 +724,30 @@ tab_x</code></pre>
 <p><br></p>
 <p><strong>THESE 10 STYLES HAD THEIR ENTIRE INVENTORY(INITIAL PCS)
 USED</strong></p>
-<pre><code>##     style_id percent_leftover
-## 5     Style5                0
-## 59   Style66                0
-## 66   Style75                0
-## 108 Style127                0
-## 146 Style173                0
-## 161 Style190                0
-## 189 Style218                0
-## 215 Style245                0
-## 221 Style251                0
-## 224 Style254                0</code></pre>
+<pre><code>##     style_id percent_leftover initial_amount
+## 5     Style5                0              1
+## 59   Style66                0              3
+## 66   Style75                0              2
+## 108 Style127                0              1
+## 146 Style173                0              3
+## 161 Style190                0              4
+## 189 Style218                0              1
+## 215 Style245                0              2
+## 221 Style251                0              3
+## 224 Style254                0              1</code></pre>
+<p><strong>THESE 10 STYLES HAD THE MOST INVENTORY(INITIAL PCS)
+USED</strong></p>
+<pre><code>##     style_id amount_used initial_amount
+## 68   Style78        29.0           66.0
+## 81   Style92        21.0           36.0
+## 111 Style132        18.3          142.3
+## 70   Style80        17.3           89.3
+## 35   Style36        16.0           81.0
+## 162 Style191        15.5          129.0
+## 71   Style82        12.0           42.0
+## 171 Style200        11.5          276.0
+## 1     Style1        10.0           31.0
+## 25   Style25        10.0           67.0</code></pre>
 <pre class="r"><code># 
 # theoretical_lot_audits[which(grepl(&quot;2022$&quot;, theoretical_lot_audits$System.Entry.Date)), ]
 # 

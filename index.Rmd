@@ -245,6 +245,7 @@ tab_x
 every_style = unique(theoretical_lot_audits$Style.[which(theoretical_lot_audits$Initial.Stock.Pcs != "0")])
 
 every_style_remaining_pcs = c()
+every_style_sum_initial = c()
 
 for(i in every_style){
   
@@ -253,13 +254,48 @@ for(i in every_style){
   sum_final_pcs = sum(theoretical_lot_audits$Final.Count.Pcs[which(theoretical_lot_audits$Style. == i)])
   
   every_style_remaining_pcs = append(every_style_remaining_pcs, (sum_final_pcs/ sum_initial_pcs))
+  
+  every_style_sum_initial = append(every_style_sum_initial, sum_initial_pcs)
+  
+  
 
   
 }
-style_leftover_df = data.frame(style_id = every_style, percent_leftover = every_style_remaining_pcs)
+style_leftover_df = data.frame(style_id = every_style, percent_leftover = every_style_remaining_pcs, initial_amount = every_style_sum_initial)
 
 style_leftover_df[which(style_leftover_df$percent_leftover == 0), ]
 ```
+
+**THESE 10 STYLES HAD THE MOST INVENTORY(INITIAL PCS) USED**
+```{r, echo=FALSE}
+every_style = unique(theoretical_lot_audits$Style.[which(theoretical_lot_audits$Initial.Stock.Pcs != "0")])
+
+every_style_used_pcs = c()
+every_style_sum_initial = c()
+
+for(i in every_style){
+  
+  sum_initial_pcs = sum(theoretical_lot_audits$Initial.Stock.Pcs[which(theoretical_lot_audits$Style. == i)])
+  
+  sum_final_pcs = sum(theoretical_lot_audits$Final.Count.Pcs[which(theoretical_lot_audits$Style. == i)])
+  
+  every_style_used_pcs = append(every_style_used_pcs, (sum_initial_pcs - sum_final_pcs))
+  every_style_sum_initial = append(every_style_sum_initial, sum_initial_pcs)
+  
+  
+}
+style_used_df = data.frame(style_id = every_style, amount_used = every_style_used_pcs, initial_amount = every_style_sum_initial)
+
+style_used_df[order(style_used_df$amount_used, decreasing = TRUE), ][1:10, ]
+```
+
+
+
+
+
+
+
+
 
 
 
