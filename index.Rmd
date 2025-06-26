@@ -45,22 +45,35 @@ theoretical_lot_audits$Adjusted..Pcs[theoretical_lot_audits$Adjusted..Pcs == "" 
 
 ```{r}
 # new data frame with 0 instead of null values
+theoretical_lot_audits[1:20, ] # first 20 rows
+```
+```{r}
+# this shows that there is still an issue with the data as there is a "|" where there shoudl eb a number
+unique(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
 
-theoretical_lot_audits
+```
+```{r}
+# since this should be 0 like the null values lets fix it
+theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "|"), ]
+
+```
+```{r}
+# fixed the data entry error
+theoretical_lot_audits$Adjusted..Pcs[theoretical_lot_audits$Adjusted..Pcs == "|" & theoretical_lot_audits$System.User != ""] = c(0)
+
+theoretical_lot_audits[which(theoretical_lot_audits$Lot. == "Lot2485"), ]
+
 ```
 
+###**DATA OBSERVATIONS**
 
-
-
-**DATA OBSERVATIONS**
-
-Total # Unique Lots
+#####Total Number of  Unique Lots
 
 ```{r}
 # look for duplicate lots
 duplicates = theoretical_lot_audits$Lot.[duplicated(theoretical_lot_audits$Lot.)]
 
-duplicates
+duplicates[1:20] # rest are also null
 ```
 
 
@@ -90,29 +103,28 @@ Unique Lots Audited (# & %)
 
 ```{r}
 # every audited lot
-theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs != ""), ]
+audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs != ""), ]
 
+audited_lots_df[1:20, ] # first 20 rows
 ```
-
-
-
-
-
-
 
 ```{r}
+# duplicate audited lots
+audited_duplicates = audited_lots_df$Lot.[duplicated(audited_lots_df$Lot.)]
 
-
-for(i in duplicated_lots){
-  
-  dup_df = theoretical_lot_audits[which(theoretical_lot_audits$Lot.  == i),]
-  
-  print(dup_df[, c(3, 10)])
-  
-  
-}
+audited_duplicates
 ```
 
+```{r}
+# number of unique audited lots
+num_unique_audited_lots = dim(audited_lots_df)[1] - length(audited_duplicates)
+num_unique_audited_lots
+```
+
+```{r}
+# percentage of unique lots audited
+(num_unique_audited_lots / num_unique_lots) * 100
+```
 
 
 
@@ -120,6 +132,92 @@ Unique Lots Remaining to be Audited (# & %)
 
 
 ```{r}
+# every lot that isn't audited
+not_audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. != "" ), ]
+
+head(not_audited_lots_df) #shows first 6 rows
+
+```
+
+```{r}
+# shows if there are any duplicate not audited lots
+
+not_audited_duplicates = not_audited_lots_df$Lot.[duplicated(not_audited_lots_df$Lot.)]
+
+not_audited_duplicates
+
+```
+
+```{r}
+# since there are no duplicates we can use just the dimensions of the data frame
+
+# number of unique lots that aren't audited
+dim(not_audited_lots_df)[1] 
+```
+```{r}
+# percentage of unique lots not yet audited
+
+(dim(not_audited_lots_df)[1]  / num_unique_lots) * 100
+```
+
+
+
+
+
+
+
+Total Adjustments (pcs) (# & %)
+
+```{r}
+# this includes duplicate lots since we're looking for total not unique
+
+# total number of adjustments
+total_num_adjustments = length(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
+
+total_num_adjustments
+```
+
+```{r}
+# where the data stops
+last_data_index = which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. == "")[1] - 1
+
+
+# because of the way that I cleaned my data, percentage adjusted is the same as percentage of lots audited
+
+# percentage of adjustments made
+(total_num_adjustments / dim(theoretical_lot_audits[1:last_data_index, ])[1]) * 100
+
+```
+
+
+```{r}
+# theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")]
+# length(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
+
+unique(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
+
+sum(as.numeric((theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])))
+
+
+tab_x = table(as.numeric((theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])))
+tab_x
+```
+what percentage of initial anf final counts were accurate
+```{r}
+
+
+```
+
+
+
+
+any other relevant insights
+- what style had the most percentage of its inventory used?(pick top 5 and bottom 5)
+
+
+
+
+```{r, eval=FALSE}
 # 
 # theoretical_lot_audits[which(grepl("2022$", theoretical_lot_audits$System.Entry.Date)), ]
 # 
@@ -148,29 +246,6 @@ recieved_dates_without_years
 
 
 
-```{r}
-# every lot that isn't audited
-not_audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. != "" ), ]
-
-not_audited_lots_df
-
-```
-
-```{r}
-
-not_audited_duplicates = not_audited_lots_df$Lot.[duplicated(not_audited_lots_df$Lot.)]
-
-# shows if there are any duplicate not audited lots
-not_audited_duplicates
-
-```
-
-```{r}
-# since there are no duplicates we can use just the dimensions of the data frame
-
-# number of unique lots that aren't audited
-dim(not_audited_lots_df)[1]
-```
 
 
 
@@ -178,20 +253,6 @@ dim(not_audited_lots_df)[1]
 
 
 
-
-Total Adjustments (pcs) (# & %)
-```{r}
-theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")]
-length(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
-
-```
-
-
-
-
-
-any other relevant insights
-- what style had the most percentage of its inventory used?(pick top 5 and bottom 5)
 
 
 
