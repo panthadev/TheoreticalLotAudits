@@ -1,0 +1,221 @@
+---
+title: "index"
+output: html_document
+date: "2025-06-25"
+---
+
+```{r}
+library(plotly)
+
+```
+
+```{r}
+theoretical_lot_audits = read.csv(file = "data/assesment.csv")
+```
+
+
+**CLEAN DATA**
+
+```{r}
+# this represents all of the rows where there is no value in the adjusted pieces column. I chose to use this over null values in the dates because i wanted to make sure that the empty cells in adjusted pieces that corresponded to an audit were because the initial_stock - final_count was 0.
+theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == ""), ]
+
+```
+
+```{r}
+
+# this shows that indeed all of the null values in adjusted_pcs where there was an audit was because the adjustment was 0
+null_adjusted_audits = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != ""), ]
+
+null_adjusted_audits
+
+null_adjusted_audits$Initial.Stock.Pcs - null_adjusted_audits$Final.Count.Pcs
+
+
+```
+
+```{r}
+
+# Ill replace the null values with 0
+adjusted_pc_null_index = which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != "")
+
+theoretical_lot_audits$Adjusted..Pcs[theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != ""] = rep(0, 19)
+
+```
+
+```{r}
+# new data frame with 0 instead of null values
+
+theoretical_lot_audits
+```
+
+
+
+
+**DATA OBSERVATIONS**
+
+Total # Unique Lots
+
+```{r}
+# look for duplicate lots
+duplicates = theoretical_lot_audits$Lot.[duplicated(theoretical_lot_audits$Lot.)]
+
+duplicates
+```
+
+
+
+```{r}
+# there are 6 repeat lots
+duplicated_lots = duplicates[which(duplicates != "")]
+duplicated_lots
+```
+
+```{r}
+# number of total lots - number of duplicate lots
+num_unique_lots = length(theoretical_lot_audits$Lot.[which(theoretical_lot_audits$Lot. != "")]) - length(duplicated_lots)
+
+# number of unique lots
+num_unique_lots
+
+```
+
+
+
+Unique Lots Audited (# & %)
+
+
+- what year has the most/least amount of lots audited
+- what months/year has the most accurate amount of lots audited
+
+```{r}
+# every audited lot
+theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs != ""), ]
+
+```
+
+
+
+
+
+
+
+```{r}
+
+
+for(i in duplicated_lots){
+  
+  dup_df = theoretical_lot_audits[which(theoretical_lot_audits$Lot.  == i),]
+  
+  print(dup_df[, c(3, 10)])
+  
+  
+}
+```
+
+
+
+
+Unique Lots Remaining to be Audited (# & %)
+
+
+```{r}
+# 
+# theoretical_lot_audits[which(grepl("2022$", theoretical_lot_audits$System.Entry.Date)), ]
+# 
+# x = unique(substr(theoretical_lot_audits$System.Entry.Date, nchar(theoretical_lot_audits$System.Entry.Date)-3, nchar(theoretical_lot_audits$System.Entry.Date)))
+# 
+# x
+
+
+
+recieved_dates_w_years = theoretical_lot_audits[which(grepl("/",theoretical_lot_audits$Received.Date )), ]
+
+recieved_dates_w_years
+
+
+
+recieved_dates_without_years = theoretical_lot_audits[which(!grepl("/",theoretical_lot_audits$Received.Date )), ]
+
+recieved_dates_without_years
+# 
+# 
+# y = unique(substr(theoretical_lot_audits$Received.Date, nchar(theoretical_lot_audits$Received.Date)-3, nchar(theoretical_lot_audits$Received.Date)))
+# 
+# y
+```
+
+
+
+
+```{r}
+# every lot that isn't audited
+not_audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. != "" ), ]
+
+not_audited_lots_df
+
+```
+
+```{r}
+
+not_audited_duplicates = not_audited_lots_df$Lot.[duplicated(not_audited_lots_df$Lot.)]
+
+# shows if there are any duplicate not audited lots
+not_audited_duplicates
+
+```
+
+```{r}
+# since there are no duplicates we can use just the dimensions of the data frame
+
+# number of unique lots that aren't audited
+dim(not_audited_lots_df)[1]
+```
+
+
+
+
+
+
+
+
+Total Adjustments (pcs) (# & %)
+```{r}
+theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")]
+length(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
+
+```
+
+
+
+
+
+any other relevant insights
+- what style had the most percentage of its inventory used?(pick top 5 and bottom 5)
+
+
+
+```{r}
+# used excel pivot tables to find errors
+
+# there appears to have been an audit where the admin did not enter their name or the system entry date
+theoretical_lot_audits[which(theoretical_lot_audits$System.User == "" & theoretical_lot_audits$Adjusted..Pcs != ""), ]
+
+```
+
+
+```{r}
+
+# fix data entry error for incorrect system entry date
+theoretical_lot_audits[which(theoretical_lot_audits$System.Entry.Date == "5/31/0202"), ] 
+
+theoretical_lot_audits$System.Entry.Date[theoretical_lot_audits$System.Entry.Date == "5/31/0202"] = "5/31/2022"
+
+theoretical_lot_audits[2021, ]
+
+```
+
+
+
+
+
