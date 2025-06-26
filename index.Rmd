@@ -1,12 +1,12 @@
 ---
-title: "index"
+title: "Theoretical Lot Audits Data Observations"
 output: html_document
 date: "2025-06-25"
 ---
 
-```{r}
+Loading Packages and Data
+```{r, results='hide'}
 library(plotly)
-
 ```
 
 ```{r}
@@ -14,17 +14,18 @@ theoretical_lot_audits = read.csv(file = "data/assesment.csv")
 ```
 
 
-**CLEAN DATA**
+### **DATA CLEANING**
 
+
+There are rows where there is a System.Entry.Date and a System.User but nothing in the Adjusted..Pcs column.
+<br>
 ```{r}
-# this represents all of the rows where there is no value in the adjusted pieces column. I chose to use this over null values in the dates because i wanted to make sure that the empty cells in adjusted pieces that corresponded to an audit were because the initial_stock - final_count was 0.
-theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == ""), ]
-
+head(theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == ""), ])
 ```
 
+This shows that indeed all of the null values in Adjusted.Pcs where there was a System.Entry.Date/ System.User was because the adjustment was 0.
+<br>
 ```{r}
-
-# this shows that indeed all of the null values in adjusted_pcs where there was an audit was because the adjustment was 0
 null_adjusted_audits = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != ""), ]
 
 null_adjusted_audits
@@ -34,29 +35,32 @@ null_adjusted_audits$Initial.Stock.Pcs - null_adjusted_audits$Final.Count.Pcs
 
 ```
 
-```{r}
 
-# Ill replace the null values with 0
+I'll replace the null values with 0
+```{r}
 adjusted_pc_null_index = which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != "")
 
 theoretical_lot_audits$Adjusted..Pcs[theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != ""] = rep(0, 19)
 
 ```
 
+This is the new data frame with 0 instead of null values
 ```{r}
-# new data frame with 0 instead of null values
 theoretical_lot_audits[1:20, ] # first 20 rows
 ```
+
+This shows that there is still an issue with the Adjusted.Pcs column as there is a "|" where there should be a number
 ```{r}
-# this shows that there is still an issue with the data as there is a "|" where there shoudl eb a number
+# 
 unique(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
 
 ```
 ```{r}
-# since this should be 0 like the null values lets fix it
 theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "|"), ]
 
 ```
+
+Since it should be 0 like the null values lets fix it.
 ```{r}
 # fixed the data entry error
 theoretical_lot_audits$Adjusted..Pcs[theoretical_lot_audits$Adjusted..Pcs == "|" & theoretical_lot_audits$System.User != ""] = c(0)
@@ -65,49 +69,63 @@ theoretical_lot_audits[which(theoretical_lot_audits$Lot. == "Lot2485"), ]
 
 ```
 
-###**DATA OBSERVATIONS**
-
-#####Total Number of  Unique Lots
-
+Another Error: Fix data entry error for incorrect system entry date
 ```{r}
-# look for duplicate lots
+theoretical_lot_audits[which(theoretical_lot_audits$System.Entry.Date == "5/31/0202"), ] 
+
+theoretical_lot_audits$System.Entry.Date[theoretical_lot_audits$System.Entry.Date == "5/31/0202"] = "5/31/2022"
+
+theoretical_lot_audits[2021, ]
+```
+
+
+
+<br>
+
+### **DATA OBSERVATIONS**
+<br>
+<br>
+
+#### **Total Number of  Unique Lots**
+<br>
+Look for duplicate lots.
+```{r}
 duplicates = theoretical_lot_audits$Lot.[duplicated(theoretical_lot_audits$Lot.)]
 
 duplicates[1:20] # rest are also null
 ```
 
-
-
+There are 6 repeat lots
 ```{r}
-# there are 6 repeat lots
 duplicated_lots = duplicates[which(duplicates != "")]
 duplicated_lots
 ```
 
+**THERE ARE 2562 UNIQUE LOTS**
 ```{r}
 # number of total lots - number of duplicate lots
 num_unique_lots = length(theoretical_lot_audits$Lot.[which(theoretical_lot_audits$Lot. != "")]) - length(duplicated_lots)
 
 # number of unique lots
-num_unique_lots
+paste("THERE ARE",num_unique_lots, "UNIQUE LOTS")
 
 ```
 
+<br>
 
-
-Unique Lots Audited (# & %)
+#### **Unique Lots Audited (# & %)**
 
 
 - what year has the most/least amount of lots audited
 - what months/year has the most accurate amount of lots audited
 
+Every audited lot.
 ```{r}
-# every audited lot
 audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs != ""), ]
 
 audited_lots_df[1:20, ] # first 20 rows
 ```
-
+Find duplicate audited lots.
 ```{r}
 # duplicate audited lots
 audited_duplicates = audited_lots_df$Lot.[duplicated(audited_lots_df$Lot.)]
@@ -115,68 +133,79 @@ audited_duplicates = audited_lots_df$Lot.[duplicated(audited_lots_df$Lot.)]
 audited_duplicates
 ```
 
+**THERE ARE  2463 UNIQUE AUDITED LOTS**
+
 ```{r}
-# number of unique audited lots
 num_unique_audited_lots = dim(audited_lots_df)[1] - length(audited_duplicates)
-num_unique_audited_lots
+paste("THERE ARE",num_unique_audited_lots, "UNIQUE AUDITED LOTS")
 ```
 
+**96.14 PERCENT OF UNIQUE LOTS HAVE BEEN AUDITED**
 ```{r}
 # percentage of unique lots audited
-(num_unique_audited_lots / num_unique_lots) * 100
+percent_audited_unique_lots = (num_unique_audited_lots / num_unique_lots) * 100
+paste(round(percent_audited_unique_lots, 2), "PERCENT OF UNIQUE LOTS HAVE BEEN AUDITED")
 ```
 
 
+<br>
 
-Unique Lots Remaining to be Audited (# & %)
+#### **Unique Lots Remaining to be Audited (# & %)**
 
+<br>
 
+Every lot that isn't audited.
 ```{r}
-# every lot that isn't audited
 not_audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. != "" ), ]
 
 head(not_audited_lots_df) #shows first 6 rows
 
 ```
 
+Shows if there are any duplicate not audited lots.
 ```{r}
-# shows if there are any duplicate not audited lots
 
 not_audited_duplicates = not_audited_lots_df$Lot.[duplicated(not_audited_lots_df$Lot.)]
 
 not_audited_duplicates
 
 ```
-
+**99 LOTS HAVEN'T BEEN AUDITED**
 ```{r}
 # since there are no duplicates we can use just the dimensions of the data frame
 
 # number of unique lots that aren't audited
-dim(not_audited_lots_df)[1] 
+paste(dim(not_audited_lots_df)[1], "LOTS HAVEN'T BEEN AUDITED" )
 ```
+
+**3.86 PERCENT OF LOTS HAVENT BEEN AUDITED**
 ```{r}
 # percentage of unique lots not yet audited
 
-(dim(not_audited_lots_df)[1]  / num_unique_lots) * 100
+paste(round((dim(not_audited_lots_df)[1]  / num_unique_lots) * 100, 2), "PERCENT OF LOTS HAVENT BEEN AUDITED")
 ```
 
 
 
 
+<br>
 
 
+#### **Total Adjustments (pcs) (# & %)**
 
-Total Adjustments (pcs) (# & %)
+<br>
 
+**THERE ARE 2450 TOTAL ADJUSTMENTS**
 ```{r}
 # this includes duplicate lots since we're looking for total not unique
 
 # total number of adjustments
 total_num_adjustments = length(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
 
-total_num_adjustments
+paste("THERE ARE",total_num_adjustments, "TOTAL ADJUSTMENTS")
 ```
 
+**95.4 PERCENT OF LOTS HAVE HAD AN ADJUSTMENT MADE**
 ```{r}
 # where the data stops
 last_data_index = which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. == "")[1] - 1
@@ -185,7 +214,7 @@ last_data_index = which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical
 # because of the way that I cleaned my data, percentage adjusted is the same as percentage of lots audited
 
 # percentage of adjustments made
-(total_num_adjustments / dim(theoretical_lot_audits[1:last_data_index, ])[1]) * 100
+paste(round((total_num_adjustments / dim(theoretical_lot_audits[1:last_data_index, ])[1]) * 100, 2), "PERCENT OF LOTS HAVE HAD AN ADJUSTMENT MADE")
 
 ```
 
@@ -202,17 +231,37 @@ sum(as.numeric((theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audit
 tab_x = table(as.numeric((theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])))
 tab_x
 ```
-what percentage of initial anf final counts were accurate
-```{r}
 
 
+<br>
+
+### OTHER INSIGHTS
+
+<br>
+
+
+**THESE 10 STYLES HAD THEIR ENTIRE INVENTORY(INITIAL PCS) USED**
+```{r, echo=FALSE}
+every_style = unique(theoretical_lot_audits$Style.[which(theoretical_lot_audits$Initial.Stock.Pcs != "0")])
+
+every_style_remaining_pcs = c()
+
+for(i in every_style){
+  
+  sum_initial_pcs = sum(theoretical_lot_audits$Initial.Stock.Pcs[which(theoretical_lot_audits$Style. == i)])
+  
+  sum_final_pcs = sum(theoretical_lot_audits$Final.Count.Pcs[which(theoretical_lot_audits$Style. == i)])
+  
+  every_style_remaining_pcs = append(every_style_remaining_pcs, (sum_final_pcs/ sum_initial_pcs))
+
+  
+}
+style_leftover_df = data.frame(style_id = every_style, percent_leftover = every_style_remaining_pcs)
+
+style_leftover_df[which(style_leftover_df$percent_leftover == 0), ]
 ```
 
 
-
-
-any other relevant insights
-- what style had the most percentage of its inventory used?(pick top 5 and bottom 5)
 
 
 
@@ -265,16 +314,7 @@ theoretical_lot_audits[which(theoretical_lot_audits$System.User == "" & theoreti
 ```
 
 
-```{r}
 
-# fix data entry error for incorrect system entry date
-theoretical_lot_audits[which(theoretical_lot_audits$System.Entry.Date == "5/31/0202"), ] 
-
-theoretical_lot_audits$System.Entry.Date[theoretical_lot_audits$System.Entry.Date == "5/31/0202"] = "5/31/2022"
-
-theoretical_lot_audits[2021, ]
-
-```
 
 
 
