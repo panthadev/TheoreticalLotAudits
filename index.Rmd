@@ -28,7 +28,7 @@ This shows that indeed all of the null values in Adjusted.Pcs where there was a 
 ```{r}
 null_adjusted_audits = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$System.User != ""), ]
 
-null_adjusted_audits
+null_adjusted_audits[1:20, ]# first 20 rows
 
 null_adjusted_audits$Initial.Stock.Pcs - null_adjusted_audits$Final.Count.Pcs
 
@@ -77,8 +77,14 @@ theoretical_lot_audits$System.Entry.Date[theoretical_lot_audits$System.Entry.Dat
 
 theoretical_lot_audits[2021, ]
 ```
+Would clean but not enough information to.
+```{r}
+# used excel pivot tables to find errors
 
+# there appears to have been an audit where the admin did not enter their name or the system entry date
+theoretical_lot_audits[which(theoretical_lot_audits$System.User == "" & theoretical_lot_audits$Adjusted..Pcs != ""), ]
 
+```
 
 <br>
 
@@ -219,7 +225,7 @@ paste(round((total_num_adjustments / dim(theoretical_lot_audits[1:last_data_inde
 ```
 
 
-```{r}
+```{r, echo=FALSE, eval=FALSE}
 # theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")]
 # length(theoretical_lot_audits$Adjusted..Pcs[which(theoretical_lot_audits$Adjusted..Pcs != "")])
 
@@ -314,7 +320,7 @@ ggplot(top_10_used_styles, aes(x = style_id, y = amount_used)) +
 
 **LOTS RECEIVED PER YEAR**
 (FOR RECIEVE DATES THAT INCLUDED DATES NOT NUMBER CODES)
-```{r, eval=FALSE}
+```{r, echo=FALSE,eval=FALSE}
 # 
 # theoretical_lot_audits[which(grepl("2022$", theoretical_lot_audits$System.Entry.Date)), ]
 # 
@@ -380,22 +386,6 @@ ggplot(lots_per_year_df, aes(x = year, y = lots_received)) +
 ```
 
 
-
-
-
-
-
-
-
-
-
-```{r}
-# used excel pivot tables to find errors
-
-# there appears to have been an audit where the admin did not enter their name or the system entry date
-theoretical_lot_audits[which(theoretical_lot_audits$System.User == "" & theoretical_lot_audits$Adjusted..Pcs != ""), ]
-
-```
 
 
 

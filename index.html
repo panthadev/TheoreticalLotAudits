@@ -395,7 +395,7 @@ there was a System.Entry.Date/ System.User was because the adjustment
 was 0. <br></p>
 <pre class="r"><code>null_adjusted_audits = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs == &quot;&quot; &amp; theoretical_lot_audits$System.User != &quot;&quot;), ]
 
-null_adjusted_audits</code></pre>
+null_adjusted_audits[1:20, ]# first 20 rows</code></pre>
 <pre><code>##      System.Entry.Date System.User    Lot. Received.Date   Style.
 ## 17           5/31/2022         Don  Lot949     5/15/2021   Style2
 ## 160          5/27/2022         Dan Lot2228     1/29/2022  Style16
@@ -416,6 +416,7 @@ null_adjusted_audits</code></pre>
 ## 2513         5/25/2022         Don  Lot863         44390 Style252
 ## 2515         5/25/2022         Don   Lot84         44390 Style253
 ## 2567          6/2/2022         Don Lot1782                       
+## NA                &lt;NA&gt;        &lt;NA&gt;    &lt;NA&gt;          &lt;NA&gt;     &lt;NA&gt;
 ##               Desc.   Color. Received.Pcs Initial.Stock.Pcs Adjusted..Pcs
 ## 17     Description2 Color140            2                 2              
 ## 160   Description16 Color140            2                 2              
@@ -436,6 +437,7 @@ null_adjusted_audits</code></pre>
 ## 2513 Description252  Color35            1                 1              
 ## 2515 Description253 Color166            1                 1              
 ## 2567                Color140            0                NA              
+## NA             &lt;NA&gt;     &lt;NA&gt;           NA                NA          &lt;NA&gt;
 ##      Final.Count.Pcs
 ## 17                 2
 ## 160                2
@@ -455,7 +457,8 @@ null_adjusted_audits</code></pre>
 ## 2095               2
 ## 2513               1
 ## 2515               1
-## 2567               0</code></pre>
+## 2567               0
+## NA                NA</code></pre>
 <pre class="r"><code>null_adjusted_audits$Initial.Stock.Pcs - null_adjusted_audits$Final.Count.Pcs</code></pre>
 <pre><code>##  [1]  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0 NA</code></pre>
 <p>I’ll replace the null values with 0</p>
