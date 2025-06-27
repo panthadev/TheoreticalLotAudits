@@ -3,15 +3,18 @@ title: "Theoretical Lot Audits Data Observations"
 output: html_document
 date: "2025-06-25"
 ---
+<a id="top"></a>
 
-Loading Packages and Data
-```{r, results='hide'}
-library(plotly)
-```
+<br>
+<nav style="background-color:#f8f9fa; padding: 10px; margin-bottom: 20px; border-bottom: 1px solid #ddd;"> <a href="#data_observation" style="margin-right: 20px;">Data Observations</a> <a href="#other" style="margin-right: 20px;">Other Observations(w/ visuals)</a></nav>
+<br>
 
+
+Loading Data
 ```{r}
 theoretical_lot_audits = read.csv(file = "data/assesment.csv")
 ```
+
 
 
 ### **DATA CLEANING**
@@ -87,6 +90,11 @@ theoretical_lot_audits[which(theoretical_lot_audits$System.User == "" & theoreti
 ```
 
 <br>
+<a id="data_observation"></a>
+<br>
+
+<nav style="background-color:#f8f9fa; padding: 10px; margin-bottom: 20px; border-bottom: 1px solid #ddd;"> <a href="#top" style="margin-right: 20px;">Back To Top</a></nav>
+
 
 ### **DATA OBSERVATIONS**
 <br>
@@ -198,7 +206,7 @@ paste(round((dim(not_audited_lots_df)[1]  / num_unique_lots) * 100, 2), "PERCENT
 
 <br>
 
-**THERE ARE 2450 TOTAL ADJUSTMENTS**
+**THERE ARE 2469 TOTAL ADJUSTMENTS**
 ```{r}
 # this includes duplicate lots since we're looking for total not unique
 
@@ -208,7 +216,7 @@ total_num_adjustments = length(theoretical_lot_audits$Adjusted..Pcs[which(theore
 paste("THERE ARE",total_num_adjustments, "TOTAL ADJUSTMENTS")
 ```
 
-**95.4 PERCENT OF LOTS HAVE HAD AN ADJUSTMENT MADE**
+**96.14 PERCENT OF LOTS HAVE HAD AN ADJUSTMENT MADE**
 ```{r}
 # where the data stops
 last_data_index = which(theoretical_lot_audits$Adjusted..Pcs == "" & theoretical_lot_audits$Lot. == "")[1] - 1
@@ -237,8 +245,11 @@ tab_x
 
 
 <br>
+<a id="other"></a>
+<br>
+<nav style="background-color:#f8f9fa; padding: 10px; margin-bottom: 20px; border-bottom: 1px solid #ddd;"> <a href="#top" style="margin-right: 20px;">Back To Top</a></nav>
 
-### OTHER INSIGHTS
+### **OTHER INSIGHTS**
 
 ```{r}
 library(ggplot2)
@@ -296,13 +307,13 @@ for(i in every_style){
   
   
 }
-style_used_df = data.frame(style_id = every_style, amount_used__or_missing = every_style_used_pcs, initial_amount = every_style_sum_initial)
+style_used_df = data.frame(style_id = every_style, amount_used_or_missing = every_style_used_pcs, initial_amount = every_style_sum_initial)
 
-top_10_used_styles = style_used_df[order(style_used_df$amount_used__or_missing, decreasing = TRUE), ][1:10, c(1,2)]
+top_10_used_styles = style_used_df[order(style_used_df$amount_used_or_missing, decreasing = TRUE), ][1:10, c(1,2)]
 top_10_used_styles
 ```
 ```{r}
-ggplot(top_10_used_styles, aes(x = style_id, y = amount_used__or_missing)) +
+ggplot(top_10_used_styles, aes(x = style_id, y = amount_used_or_missing)) +
   geom_col(fill = "steelblue") + 
   labs(title = "10 Most Used/Missing Style Ids", x = "Style Id", y = "Amount Used/Missing")
 
