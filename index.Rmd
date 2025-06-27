@@ -252,7 +252,7 @@ theoretical_lot_audits =  theoretical_lot_audits[!duplicated(theoretical_lot_aud
 ```
 
 
-**THESE 10 STYLES HAD THEIR ENTIRE INVENTORY(INITIAL PCS) USED**
+**THESE 10 STYLES HAD THEIR ENTIRE INVENTORY(INITIAL PCS) USED/MISSING**
 ```{r, echo=FALSE}
 every_style = unique(theoretical_lot_audits$Style.[which(theoretical_lot_audits$Initial.Stock.Pcs != "0")])
 
@@ -278,7 +278,7 @@ style_leftover_df = data.frame(style_id = every_style, percent_leftover = every_
 style_leftover_df[which(style_leftover_df$percent_leftover == 0), ]
 ```
 
-**THESE 10 STYLES HAD THE MOST INVENTORY(INITIAL PCS) USED**
+**THESE 10 STYLES HAD THE MOST INVENTORY(INITIAL PCS) USED/MISSING**
 ```{r, echo=FALSE}
 every_style = unique(theoretical_lot_audits$Style.[which(theoretical_lot_audits$Initial.Stock.Pcs != "0")])
 
@@ -296,15 +296,15 @@ for(i in every_style){
   
   
 }
-style_used_df = data.frame(style_id = every_style, amount_used = every_style_used_pcs, initial_amount = every_style_sum_initial)
+style_used_df = data.frame(style_id = every_style, amount_used__or_missing = every_style_used_pcs, initial_amount = every_style_sum_initial)
 
-top_10_used_styles = style_used_df[order(style_used_df$amount_used, decreasing = TRUE), ][1:10, c(1,2)]
+top_10_used_styles = style_used_df[order(style_used_df$amount_used__or_missing, decreasing = TRUE), ][1:10, c(1,2)]
 top_10_used_styles
 ```
 ```{r}
-ggplot(top_10_used_styles, aes(x = style_id, y = amount_used)) +
+ggplot(top_10_used_styles, aes(x = style_id, y = amount_used__or_missing)) +
   geom_col(fill = "steelblue") + 
-  labs(title = "10 Most Used Style Ids", x = "Style Id", y = "Amount Used")
+  labs(title = "10 Most Used/Missing Style Ids", x = "Style Id", y = "Amount Used/Missing")
 
 
 ```
