@@ -195,7 +195,21 @@ paste(dim(not_audited_lots_df)[1], "LOTS HAVEN'T BEEN AUDITED" )
 
 paste(round((dim(not_audited_lots_df)[1]  / num_unique_lots) * 100, 2), "PERCENT OF LOTS HAVENT BEEN AUDITED")
 ```
+```{r}
+# pie chart of lots audited/remaining to be audited
+# audited :
+audit_percentage = round(percent_audited_unique_lots, 2)
 
+not_audit_percentage = round((dim(not_audited_lots_df)[1]  / num_unique_lots) * 100, 2)
+
+percentages = c(audit_percentage, not_audit_percentage)
+
+pie(percentages,
+    labels = paste0(c("Audited", "Not Audited"), " (", percentages, "%)"),
+    col = c("green", "red"),
+    main = "Percent of Lots Audited"
+)
+```
 
 
 
