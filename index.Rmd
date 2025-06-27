@@ -121,10 +121,7 @@ paste("THERE ARE",num_unique_lots, "UNIQUE LOTS")
 
 #### **Unique Lots Audited (# & %)**
 
-
-- what year has the most/least amount of lots audited
-- what months/year has the most accurate amount of lots audited
-
+<br>
 Every audited lot.
 ```{r}
 audited_lots_df = theoretical_lot_audits[which(theoretical_lot_audits$Adjusted..Pcs != ""), ]
@@ -318,7 +315,7 @@ ggplot(top_10_used_styles, aes(x = style_id, y = amount_used)) +
 
 
 
-**LOTS RECEIVED PER YEAR**
+**LOTS THAT RECEIVED INVENTORY PER YEAR**
 (FOR RECIEVE DATES THAT INCLUDED DATES NOT NUMBER CODES)
 ```{r, echo=FALSE,eval=FALSE}
 # 
@@ -381,7 +378,7 @@ lots_per_year_df
 ```{r}
 ggplot(lots_per_year_df, aes(x = year, y = lots_received)) +
   geom_col(fill = "steelblue") + 
-  labs(title = "Lots Received Per Year", x = "Year", y = "Lots Received")
+  labs(title = "Lots That Received Inventory Per Year", x = "Year", y = "Number of Lots")
 
 ```
 
