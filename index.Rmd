@@ -237,7 +237,16 @@ tab_x
 
 ### OTHER INSIGHTS
 
+```{r}
+library(ggplot2)
+```
+
 <br>
+
+**REMOVING DUPLICATES FOR THE UPCOMING OBSERVATIONS BECAUSE THEY MESS WITH SUMS OF COLUMNS**
+```{r}
+theoretical_lot_audits =  theoretical_lot_audits[!duplicated(theoretical_lot_audits[, 3]), ]
+```
 
 
 **THESE 10 STYLES HAD THEIR ENTIRE INVENTORY(INITIAL PCS) USED**
@@ -286,7 +295,15 @@ for(i in every_style){
 }
 style_used_df = data.frame(style_id = every_style, amount_used = every_style_used_pcs, initial_amount = every_style_sum_initial)
 
-style_used_df[order(style_used_df$amount_used, decreasing = TRUE), ][1:10, ]
+top_10_used_styles = style_used_df[order(style_used_df$amount_used, decreasing = TRUE), ][1:10, c(1,2)]
+top_10_used_styles
+```
+```{r}
+ggplot(top_10_used_styles, aes(x = style_id, y = amount_used)) +
+  geom_col(fill = "steelblue") + 
+  labs(title = "10 Most Used Style Ids", x = "Style Id", y = "Amount Used")
+
+
 ```
 
 
@@ -295,13 +312,8 @@ style_used_df[order(style_used_df$amount_used, decreasing = TRUE), ][1:10, ]
 
 
 
-
-
-
-
-
-
-
+**LOTS RECEIVED PER YEAR**
+(FOR RECIEVE DATES THAT INCLUDED DATES NOT NUMBER CODES)
 ```{r, eval=FALSE}
 # 
 # theoretical_lot_audits[which(grepl("2022$", theoretical_lot_audits$System.Entry.Date)), ]
@@ -312,24 +324,60 @@ style_used_df[order(style_used_df$amount_used, decreasing = TRUE), ][1:10, ]
 
 
 
-recieved_dates_w_years = theoretical_lot_audits[which(grepl("/",theoretical_lot_audits$Received.Date )), ]
 
-recieved_dates_w_years
+received_dates_without_years = theoretical_lot_audits[which(!grepl("/",theoretical_lot_audits$Received.Date )), ]
 
-
-
-recieved_dates_without_years = theoretical_lot_audits[which(!grepl("/",theoretical_lot_audits$Received.Date )), ]
-
-recieved_dates_without_years
+received_dates_without_years
 # 
 # 
-# y = unique(substr(theoretical_lot_audits$Received.Date, nchar(theoretical_lot_audits$Received.Date)-3, nchar(theoretical_lot_audits$Received.Date)))
-# 
-# y
+
+
+
+
+
+
+
+
+```
+
+```{r, echo=FALSE}
+received_dates_w_years = theoretical_lot_audits[which(grepl("/",theoretical_lot_audits$Received.Date )), ]
+
+#received_dates_w_years
+
+
+
+every_year_unique = unique(substr(received_dates_w_years$Received.Date, nchar(received_dates_w_years$Received.Date)-3, nchar(received_dates_w_years$Received.Date)))
+
+#every_year_unique
+
+
+
+num_lots_received = c()
+for(i in every_year_unique){
+  
+  
+  all_data_for_year = received_dates_w_years[which(substr(received_dates_w_years$Received.Date, nchar(received_dates_w_years$Received.Date)-3, nchar(received_dates_w_years$Received.Date)) == i ), ]
+  
+  num_lots_received = append(num_lots_received, length(all_data_for_year$Lot.))
+}
+
+lots_per_year_df = data.frame(year = every_year_unique, lots_received = num_lots_received)
+
+lots_per_year_df
+
+
 ```
 
 
 
+
+```{r}
+ggplot(lots_per_year_df, aes(x = year, y = lots_received)) +
+  geom_col(fill = "steelblue") + 
+  labs(title = "Lots Received Per Year", x = "Year", y = "Lots Received")
+
+```
 
 
 
